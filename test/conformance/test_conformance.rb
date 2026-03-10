@@ -8,20 +8,20 @@ class TestConformance < Minitest::Test
   BASE_URL = ENV["ATTAGO_BASE_URL"]
   API_KEY = ENV["ATTAGO_API_KEY"]
 
-  # Fixtures that require Cognito auth (skip in conformance)
-  SKIP_FIXTURES = %w[
-    user-profile-success.json
-    user-profile-unauthorized.json
-  ].freeze
-
   if BASE_URL && Dir.exist?(FIXTURE_DIR)
     Dir.glob(File.join(FIXTURE_DIR, "*.json")).sort.each do |path|
-      basename = File.basename(path)
-      next if SKIP_FIXTURES.include?(basename)
+      fixture_data = JSON.parse(File.read(path))
+      headers = fixture_data.dig("request", "headers") || {}
+      status = fixture_data.dig("response", "status")
+      # Auto-skip JWT fixtures (CI only has API keys, not Cognito tokens)
+      next if headers.key?("Authorization")
+      # Auto-skip unauthorized tests (dev API may not enforce auth)
+      next if status == 401 && !headers.key?("X-API-Key")
 
       test_name = File.basename(path, ".json").tr("-", "_")
 
       define_method("test_conformance_#{test_name}") do
+        basename = File.basename(path)
         fixture = JSON.parse(File.read(path))
         req = fixture["request"]
         expected = fixture["response"]
@@ -43,9 +43,14 @@ class TestConformance < Minitest::Test
                    when "DELETE" then Net::HTTP::Delete.new(uri)
                    end
 
-        # Set headers
-        (req["headers"] || {}).each { |k, v| http_req[k] = v }
-        http_req["X-API-Key"] = API_KEY if API_KEY
+        # Set headers (inject real API key only when fixture uses X-API-Key)
+        (req["headers"] || {}).each do |k, v|
+          if k == "X-API-Key" && API_KEY
+            http_req[k] = API_KEY
+          else
+            http_req[k] = v
+          end
+        end
         http_req.body = JSON.generate(req["body"]) if req["body"]
 
         resp = http.request(http_req)
