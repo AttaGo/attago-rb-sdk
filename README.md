@@ -250,7 +250,3 @@ bundle exec rake test
 # Run conformance tests (requires live API)
 ATTAGO_BASE_URL=https://api.attago.bid ATTAGO_API_KEY=ak_... bundle exec rake conformance
 ```
-
-## License
-
-[MIT](LICENSE)
