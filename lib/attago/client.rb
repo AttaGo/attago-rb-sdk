@@ -10,7 +10,9 @@ module Attago
     MAX_ERROR_BODY = 1_048_576   # 1 MB
     MAX_SUCCESS_BODY = 10_485_760 # 10 MB
 
-    attr_reader :base_url
+    attr_reader :base_url,
+                :agent, :data, :subscriptions, :payments, :wallets,
+                :webhooks, :mcp, :api_keys, :bundles, :push, :redeem
 
     def initialize(api_key: nil, signer: nil, email: nil, password: nil,
                    cognito_client_id: nil, cognito_region: DEFAULT_COGNITO_REGION,
@@ -41,6 +43,19 @@ module Attago
           password: password
         )
       end
+
+      # Wire service namespaces
+      @agent = AgentService.new(self)
+      @data = DataService.new(self)
+      @subscriptions = SubscriptionService.new(self)
+      @payments = PaymentService.new(self)
+      @wallets = WalletService.new(self)
+      @webhooks = WebhookService.new(self)
+      @mcp = McpService.new(self)
+      @api_keys = ApiKeyService.new(self)
+      @bundles = BundleService.new(self)
+      @push = PushService.new(self)
+      @redeem = RedeemService.new(self)
     end
 
     # Core request method -- all services call this.
