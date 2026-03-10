@@ -8,7 +8,7 @@ class TestConformance < Minitest::Test
   BASE_URL = ENV["ATTAGO_BASE_URL"]
   API_KEY = ENV["ATTAGO_API_KEY"]
 
-  if BASE_URL && Dir.exist?(FIXTURE_DIR)
+  if BASE_URL && API_KEY && Dir.exist?(FIXTURE_DIR)
     Dir.glob(File.join(FIXTURE_DIR, "*.json")).sort.each do |path|
       fixture_data = JSON.parse(File.read(path))
       headers = fixture_data.dig("request", "headers") || {}
