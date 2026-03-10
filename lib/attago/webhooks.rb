@@ -22,7 +22,7 @@ module Attago
     # GET /webhooks
     def list
       data = @client.request("GET", "/user/webhooks")
-      (data["webhooks"] || []).map { |w| WebhookListItem.from_hash(w) }
+      (data["items"] || []).map { |w| WebhookListItem.from_hash(w) }
     end
 
     # DELETE /webhooks/{webhook_id}

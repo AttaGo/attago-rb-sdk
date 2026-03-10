@@ -21,7 +21,8 @@ Gem::Specification.new do |spec|
   spec.files = Dir["lib/**/*.rb", "README.md"]
   spec.require_paths = ["lib"]
 
-  # Zero runtime dependencies — stdlib only (net/http, openssl, json, uri)
+  # Ruby 3.4+ extracts base64 from stdlib — required for OpenSSL/HMAC operations
+  spec.add_dependency "base64"
 
   spec.add_development_dependency "minitest", "~> 5.0"
   spec.add_development_dependency "rake", "~> 13.0"

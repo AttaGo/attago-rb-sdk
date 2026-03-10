@@ -80,7 +80,7 @@ class TestWebhookService < Minitest::Test
   }.freeze
 
   LIST_RESPONSE = {
-    "webhooks" => [{
+    "items" => [{
       "webhookId" => "wh-1",
       "url" => "https://example.com/hook",
       "createdAt" => "2026-03-09T00:00:00Z"
