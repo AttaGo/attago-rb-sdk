@@ -15,6 +15,9 @@ require_relative "attago/api_keys"
 require_relative "attago/bundles"
 require_relative "attago/push"
 require_relative "attago/redeem"
+require_relative "attago/webhooks"
+require_relative "attago/mcp"
+require_relative "attago/listener"
 
 module Attago
 end
