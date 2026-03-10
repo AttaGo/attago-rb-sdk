@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "uri"
+
 module Attago
   class PushService
     def initialize(client)
@@ -24,7 +26,7 @@ module Attago
 
     # DELETE /push/subscriptions/{subscription_id}
     def delete(subscription_id)
-      @client.request("DELETE", "/push/subscriptions/#{subscription_id}")
+      @client.request("DELETE", "/push/subscriptions/#{URI.encode_www_form_component(subscription_id)}")
       nil
     end
   end

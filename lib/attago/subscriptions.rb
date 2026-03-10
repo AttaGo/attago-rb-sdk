@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "uri"
+
 module Attago
   class SubscriptionService
     def initialize(client)
@@ -47,13 +49,13 @@ module Attago
           }
         }
       end
-      data = @client.request("PUT", "/subscriptions/#{sub_id}", body: body)
+      data = @client.request("PUT", "/subscriptions/#{URI.encode_www_form_component(sub_id)}", body: body)
       Subscription.from_hash(data)
     end
 
     # DELETE /subscriptions/{sub_id}
     def delete(sub_id)
-      @client.request("DELETE", "/subscriptions/#{sub_id}")
+      @client.request("DELETE", "/subscriptions/#{URI.encode_www_form_component(sub_id)}")
       nil
     end
   end

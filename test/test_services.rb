@@ -317,6 +317,15 @@ class TestApiKeyService < Minitest::Test
     assert_equal "DELETE", @last_req[:method]
     assert_nil result
   end
+
+  def test_api_key_create_response_inspect_redacted
+    resp = Attago::ApiKeyCreateResponse.new(
+      key_id: "kid_123", name: "test", prefix: "ak_live",
+      key: "ak_live_secret_value_here", created_at: "2026-01-01T00:00:00Z"
+    )
+    refute_includes resp.inspect, "ak_live_secret_value_here"
+    assert_includes resp.inspect, "***"
+  end
 end
 
 class TestBundleService < Minitest::Test

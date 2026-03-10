@@ -165,7 +165,7 @@ class TestWebhookService < Minitest::Test
     server = WEBrick::HTTPServer.new(
       Port: 0,
       BindAddress: "127.0.0.1",
-      Logger: WEBrick::Log.new("/dev/null"),
+      Logger: WEBrick::Log.new(File::NULL),
       AccessLog: []
     )
 

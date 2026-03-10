@@ -44,8 +44,8 @@ module Attago
     end
 
     # Execute request, handle 402 auto-sign-and-retry with x402 signer.
-    # CRITICAL: params must be forwarded (lesson from Python audit PY-C2)
-    def do_with_x402(transport, signer, method, url, headers:, body: nil, params: nil)
+    # Params are already baked into the URL by the client before this is called.
+    def do_with_x402(transport, signer, method, url, headers:, body: nil)
       resp = transport.request(method, url, headers: headers, body: body)
       return resp unless resp.code.to_i == 402
 

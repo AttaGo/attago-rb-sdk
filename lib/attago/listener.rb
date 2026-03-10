@@ -37,7 +37,7 @@ module Attago
       @server = WEBrick::HTTPServer.new(
         Port: @port,
         BindAddress: @host,
-        Logger: WEBrick::Log.new("/dev/null"),
+        Logger: WEBrick::Log.new(File::NULL),
         AccessLog: []
       )
 

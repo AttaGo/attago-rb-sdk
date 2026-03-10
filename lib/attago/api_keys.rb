@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "uri"
+
 module Attago
   class ApiKeyService
     def initialize(client)
@@ -20,7 +22,7 @@ module Attago
 
     # DELETE /api-keys/{key_id}
     def revoke(key_id)
-      @client.request("DELETE", "/api-keys/#{key_id}")
+      @client.request("DELETE", "/api-keys/#{URI.encode_www_form_component(key_id)}")
       nil
     end
   end

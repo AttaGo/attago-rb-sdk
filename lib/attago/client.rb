@@ -70,15 +70,17 @@ module Attago
       end
 
       req_headers = build_headers(headers)
+      serialized_body = body.is_a?(Hash) ? JSON.generate(body) : body
 
       if @signer
-        resp = X402.do_with_x402(@transport || self, @signer, method, uri.to_s,
-                                  headers: req_headers, body: body, params: params)
+        transport = @transport || raw_transport_adapter
+        resp = X402.do_with_x402(transport, @signer, method, uri.to_s,
+                                  headers: req_headers, body: serialized_body)
       elsif @transport
         resp = @transport.request(method, uri.to_s, headers: req_headers,
-                                  body: body.is_a?(Hash) ? JSON.generate(body) : body)
+                                  body: serialized_body)
       else
-        resp = http_request(method, uri, req_headers, body)
+        resp = request_raw(method, uri, headers: req_headers, body: serialized_body)
       end
 
       handle_response(resp)
@@ -102,14 +104,26 @@ module Attago
       end
     end
 
-    # Internal: Used by X402.do_with_x402 when no transport override.
-    # Provides the same interface as MockTransport.request.
+    private
+
+    # Adapter that wraps request_raw with the transport interface expected by X402.
+    # Prevents infinite recursion: Client#request -> x402 -> transport.request -> request_raw
+    # instead of looping back through Client#request.
+    def raw_transport_adapter
+      owner = self
+      adapter = Object.new
+      adapter.define_singleton_method(:request) do |m, u, headers:, body: nil|
+        owner.send(:request_raw, m, u, headers: headers, body: body)
+      end
+      adapter
+    end
+
+    # Internal: raw HTTP request without x402 or routing logic.
+    # Used by the raw_transport_adapter and the non-signer/non-transport path.
     def request_raw(method, uri, headers: {}, body: nil)
       parsed = uri.is_a?(URI) ? uri : URI.parse(uri)
       http_request(method, parsed, headers, body)
     end
-
-    private
 
     def build_headers(extra)
       h = {
@@ -125,21 +139,21 @@ module Attago
     def http_request(method, uri, headers, body)
       @mu.synchronize do
         ensure_http(uri)
+
+        req = case method.to_s.upcase
+              when "GET"    then Net::HTTP::Get.new(uri)
+              when "POST"   then Net::HTTP::Post.new(uri)
+              when "PUT"    then Net::HTTP::Put.new(uri)
+              when "PATCH"  then Net::HTTP::Patch.new(uri)
+              when "DELETE" then Net::HTTP::Delete.new(uri)
+              else raise ArgumentError, "Unsupported HTTP method: #{method}"
+              end
+
+        headers.each { |k, v| req[k] = v }
+        req.body = body if body
+
+        @http.request(req)
       end
-
-      req = case method.to_s.upcase
-            when "GET"    then Net::HTTP::Get.new(uri)
-            when "POST"   then Net::HTTP::Post.new(uri)
-            when "PUT"    then Net::HTTP::Put.new(uri)
-            when "PATCH"  then Net::HTTP::Patch.new(uri)
-            when "DELETE" then Net::HTTP::Delete.new(uri)
-            else raise ArgumentError, "Unsupported HTTP method: #{method}"
-            end
-
-      headers.each { |k, v| req[k] = v }
-      req.body = body.is_a?(Hash) ? JSON.generate(body) : body if body
-
-      @http.request(req)
     end
 
     def ensure_http(uri)
@@ -160,9 +174,9 @@ module Attago
       # Read body with size cap
       body_str = resp.body || ""
       if code >= 400
-        body_str = body_str[0, MAX_ERROR_BODY] if body_str.bytesize > MAX_ERROR_BODY
+        body_str = body_str.byteslice(0, MAX_ERROR_BODY) if body_str.bytesize > MAX_ERROR_BODY
       else
-        body_str = body_str[0, MAX_SUCCESS_BODY] if body_str.bytesize > MAX_SUCCESS_BODY
+        body_str = body_str.byteslice(0, MAX_SUCCESS_BODY) if body_str.bytesize > MAX_SUCCESS_BODY
       end
 
       if code >= 400
