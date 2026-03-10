@@ -8,7 +8,7 @@ module Attago
 
     # POST /redeem
     def redeem(code)
-      data = @client.request("POST", "/redeem", body: { "code" => code })
+      data = @client.request("POST", "/user/redeem", body: { "code" => code })
       RedeemResponse.from_hash(data)
     end
   end

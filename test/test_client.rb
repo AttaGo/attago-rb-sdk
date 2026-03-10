@@ -95,7 +95,7 @@ class TestClient < Minitest::Test
   def test_json_body_sent
     t = make_transport
     client = make_client(transport: t)
-    client.request("POST", "/subscriptions", body: { "token_id" => "BTC" })
+    client.request("POST", "/user/subscriptions", body: { "token_id" => "BTC" })
     sent_body = JSON.parse(t.last_request[:body])
     assert_equal "BTC", sent_body["token_id"]
   end
@@ -112,7 +112,7 @@ class TestClient < Minitest::Test
   def test_204_returns_nil
     t = make_transport(code: 204, body: nil)
     client = make_client(transport: t)
-    result = client.request("DELETE", "/webhooks/wh-1")
+    result = client.request("DELETE", "/user/webhooks/wh-1")
     assert_nil result
   end
 

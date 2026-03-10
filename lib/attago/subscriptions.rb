@@ -16,7 +16,7 @@ module Attago
 
     # GET /subscriptions
     def list
-      data = @client.request("GET", "/subscriptions")
+      data = @client.request("GET", "/user/subscriptions")
       (data["subscriptions"] || []).map { |s| Subscription.from_hash(s) }
     end
 
@@ -32,7 +32,7 @@ module Attago
         }
       }
       body["cooldownMinutes"] = input.cooldown_minutes if input.cooldown_minutes
-      data = @client.request("POST", "/subscriptions", body: body)
+      data = @client.request("POST", "/user/subscriptions", body: body)
       Subscription.from_hash(data)
     end
 
@@ -49,13 +49,13 @@ module Attago
           }
         }
       end
-      data = @client.request("PUT", "/subscriptions/#{URI.encode_www_form_component(sub_id)}", body: body)
+      data = @client.request("PUT", "/user/subscriptions/#{URI.encode_www_form_component(sub_id)}", body: body)
       Subscription.from_hash(data)
     end
 
     # DELETE /subscriptions/{sub_id}
     def delete(sub_id)
-      @client.request("DELETE", "/subscriptions/#{URI.encode_www_form_component(sub_id)}")
+      @client.request("DELETE", "/user/subscriptions/#{URI.encode_www_form_component(sub_id)}")
       nil
     end
   end

@@ -15,25 +15,25 @@ module Attago
 
     # POST /webhooks
     def create(url)
-      data = @client.request("POST", "/webhooks", body: { "url" => url })
+      data = @client.request("POST", "/user/webhooks", body: { "url" => url })
       WebhookCreateResponse.from_hash(data)
     end
 
     # GET /webhooks
     def list
-      data = @client.request("GET", "/webhooks")
+      data = @client.request("GET", "/user/webhooks")
       (data["webhooks"] || []).map { |w| WebhookListItem.from_hash(w) }
     end
 
     # DELETE /webhooks/{webhook_id}
     def delete(webhook_id)
-      @client.request("DELETE", "/webhooks/#{URI.encode_www_form_component(webhook_id)}")
+      @client.request("DELETE", "/user/webhooks/#{URI.encode_www_form_component(webhook_id)}")
       nil
     end
 
     # POST /webhooks/{webhook_id}/test (server-side)
     def send_server_test(webhook_id)
-      data = @client.request("POST", "/webhooks/#{URI.encode_www_form_component(webhook_id)}/test")
+      data = @client.request("POST", "/user/webhooks/#{URI.encode_www_form_component(webhook_id)}/test")
       WebhookTestResult.from_hash(data)
     end
 

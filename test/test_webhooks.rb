@@ -114,7 +114,7 @@ class TestWebhookService < Minitest::Test
 
   def test_webhook_create
     result = @svc.create("https://example.com/hook")
-    assert_includes @last_req[:uri], "/v1/webhooks"
+    assert_includes @last_req[:uri], "/v1/user/webhooks"
     assert_equal "POST", @last_req[:method]
     sent = JSON.parse(@last_req[:body])
     assert_equal "https://example.com/hook", sent["url"]
@@ -125,7 +125,7 @@ class TestWebhookService < Minitest::Test
 
   def test_webhook_list
     result = @svc.list
-    assert_includes @last_req[:uri], "/v1/webhooks"
+    assert_includes @last_req[:uri], "/v1/user/webhooks"
     assert_equal "GET", @last_req[:method]
     assert_equal 1, result.size
     assert_instance_of Attago::WebhookListItem, result.first
@@ -134,14 +134,14 @@ class TestWebhookService < Minitest::Test
 
   def test_webhook_delete
     result = @svc.delete("wh-1")
-    assert_includes @last_req[:uri], "/v1/webhooks/wh-1"
+    assert_includes @last_req[:uri], "/v1/user/webhooks/wh-1"
     assert_equal "DELETE", @last_req[:method]
     assert_nil result
   end
 
   def test_webhook_send_server_test
     result = @svc.send_server_test("wh-1")
-    assert_includes @last_req[:uri], "/v1/webhooks/wh-1/test"
+    assert_includes @last_req[:uri], "/v1/user/webhooks/wh-1/test"
     assert_equal "POST", @last_req[:method]
     assert_instance_of Attago::WebhookTestResult, result
     assert_equal true, result.success

@@ -63,7 +63,7 @@ class TestSubscriptionService < Minitest::Test
 
   def test_list
     result = @svc.list
-    assert_includes @last_req[:uri], "/v1/subscriptions"
+    assert_includes @last_req[:uri], "/v1/user/subscriptions"
     assert_equal "GET", @last_req[:method]
     assert_equal 1, result.size
     assert_instance_of Attago::Subscription, result.first
@@ -78,7 +78,7 @@ class TestSubscriptionService < Minitest::Test
       cooldown_minutes: 15
     )
     result = @svc.create(input)
-    assert_includes @last_req[:uri], "/v1/subscriptions"
+    assert_includes @last_req[:uri], "/v1/user/subscriptions"
     assert_equal "POST", @last_req[:method]
     sent = JSON.parse(@last_req[:body])
     assert_equal "BTC", sent["tokenId"]
@@ -91,7 +91,7 @@ class TestSubscriptionService < Minitest::Test
   def test_update
     input = Attago::UpdateSubscriptionInput.new(label: "Updated", is_active: false)
     result = @svc.update("sub-1", input)
-    assert_includes @last_req[:uri], "/v1/subscriptions/sub-1"
+    assert_includes @last_req[:uri], "/v1/user/subscriptions/sub-1"
     assert_equal "PUT", @last_req[:method]
     sent = JSON.parse(@last_req[:body])
     assert_equal "Updated", sent["label"]
@@ -101,7 +101,7 @@ class TestSubscriptionService < Minitest::Test
 
   def test_delete
     result = @svc.delete("sub-1")
-    assert_includes @last_req[:uri], "/v1/subscriptions/sub-1"
+    assert_includes @last_req[:uri], "/v1/user/subscriptions/sub-1"
     assert_equal "DELETE", @last_req[:method]
     assert_nil result
   end
@@ -229,7 +229,7 @@ class TestWalletService < Minitest::Test
       timestamp: 1_710_000_000
     )
     result = @svc.register(input)
-    assert_includes @last_req[:uri], "/v1/wallets/register"
+    assert_includes @last_req[:uri], "/v1/payments/wallet"
     assert_equal "POST", @last_req[:method]
     sent = JSON.parse(@last_req[:body])
     assert_equal "0xabc123", sent["walletAddress"]
@@ -241,7 +241,7 @@ class TestWalletService < Minitest::Test
 
   def test_list
     result = @svc.list
-    assert_includes @last_req[:uri], "/v1/wallets"
+    assert_includes @last_req[:uri], "/v1/payments/wallets"
     assert_equal "GET", @last_req[:method]
     assert_equal 1, result.size
     assert_instance_of Attago::Wallet, result.first
@@ -249,7 +249,7 @@ class TestWalletService < Minitest::Test
 
   def test_remove
     result = @svc.remove("0xabc123")
-    assert_includes @last_req[:uri], "/v1/wallets/0xabc123"
+    assert_includes @last_req[:uri], "/v1/payments/wallet/0xabc123"
     assert_equal "DELETE", @last_req[:method]
     assert_nil result
   end
@@ -293,7 +293,7 @@ class TestApiKeyService < Minitest::Test
 
   def test_create
     result = @svc.create("My Key")
-    assert_includes @last_req[:uri], "/v1/api-keys"
+    assert_includes @last_req[:uri], "/v1/user/api-keys"
     assert_equal "POST", @last_req[:method]
     sent = JSON.parse(@last_req[:body])
     assert_equal "My Key", sent["name"]
@@ -304,7 +304,7 @@ class TestApiKeyService < Minitest::Test
 
   def test_list
     result = @svc.list
-    assert_includes @last_req[:uri], "/v1/api-keys"
+    assert_includes @last_req[:uri], "/v1/user/api-keys"
     assert_equal "GET", @last_req[:method]
     assert_equal 1, result.size
     assert_instance_of Attago::ApiKeyListItem, result.first
@@ -313,7 +313,7 @@ class TestApiKeyService < Minitest::Test
 
   def test_revoke
     result = @svc.revoke("key-1")
-    assert_includes @last_req[:uri], "/v1/api-keys/key-1"
+    assert_includes @last_req[:uri], "/v1/user/api-keys/key-1"
     assert_equal "DELETE", @last_req[:method]
     assert_nil result
   end
@@ -372,7 +372,7 @@ class TestBundleService < Minitest::Test
 
   def test_list
     result = @svc.list
-    assert_includes @last_req[:uri], "/v1/bundles"
+    assert_includes @last_req[:uri], "/v1/api/bundles"
     assert_equal "GET", @last_req[:method]
     assert_instance_of Attago::BundleListResponse, result
     assert_equal 1, result.bundles.size
@@ -385,7 +385,7 @@ class TestBundleService < Minitest::Test
   def test_purchase
     input = Attago::PurchaseBundleInput.new(bundle_index: 0, wallet_address: "0xabc")
     result = @svc.purchase(input)
-    assert_includes @last_req[:uri], "/v1/bundles/purchase"
+    assert_includes @last_req[:uri], "/v1/api/bundles"
     assert_equal "POST", @last_req[:method]
     sent = JSON.parse(@last_req[:body])
     assert_equal 0, sent["bundleIndex"]
@@ -421,7 +421,7 @@ class TestPushService < Minitest::Test
 
   def test_list
     result = @svc.list
-    assert_includes @last_req[:uri], "/v1/push/subscriptions"
+    assert_includes @last_req[:uri], "/v1/user/push-subscriptions"
     assert_equal "GET", @last_req[:method]
     assert_equal 1, result.size
     assert_instance_of Attago::PushSubscriptionResponse, result.first
@@ -432,7 +432,7 @@ class TestPushService < Minitest::Test
     keys = Attago::PushKeys.new(p256dh: "p256dh_value", auth: "auth_value")
     input = Attago::CreatePushInput.new(endpoint: "https://push.example.com/sub1", keys: keys)
     result = @svc.create(input)
-    assert_includes @last_req[:uri], "/v1/push/subscriptions"
+    assert_includes @last_req[:uri], "/v1/user/push-subscriptions"
     assert_equal "POST", @last_req[:method]
     sent = JSON.parse(@last_req[:body])
     assert_equal "https://push.example.com/sub1", sent["endpoint"]
@@ -443,7 +443,7 @@ class TestPushService < Minitest::Test
 
   def test_delete
     result = @svc.delete("ps-1")
-    assert_includes @last_req[:uri], "/v1/push/subscriptions/ps-1"
+    assert_includes @last_req[:uri], "/v1/user/push-subscriptions/ps-1"
     assert_equal "DELETE", @last_req[:method]
     assert_nil result
   end
@@ -468,7 +468,7 @@ class TestRedeemService < Minitest::Test
 
   def test_redeem
     result = @svc.redeem("PROMO-2026")
-    assert_includes @last_req[:uri], "/v1/redeem"
+    assert_includes @last_req[:uri], "/v1/user/redeem"
     assert_equal "POST", @last_req[:method]
     sent = JSON.parse(@last_req[:body])
     assert_equal "PROMO-2026", sent["code"]

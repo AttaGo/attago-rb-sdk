@@ -10,7 +10,7 @@ module Attago
 
     # GET /push/subscriptions
     def list
-      data = @client.request("GET", "/push/subscriptions")
+      data = @client.request("GET", "/user/push-subscriptions")
       (data["subscriptions"] || []).map { |s| PushSubscriptionResponse.from_hash(s) }
     end
 
@@ -20,13 +20,13 @@ module Attago
         "endpoint" => input.endpoint,
         "keys" => { "p256dh" => input.keys.p256dh, "auth" => input.keys.auth }
       }
-      data = @client.request("POST", "/push/subscriptions", body: body)
+      data = @client.request("POST", "/user/push-subscriptions", body: body)
       PushSubscriptionResponse.from_hash(data)
     end
 
     # DELETE /push/subscriptions/{subscription_id}
     def delete(subscription_id)
-      @client.request("DELETE", "/push/subscriptions/#{URI.encode_www_form_component(subscription_id)}")
+      @client.request("DELETE", "/user/push-subscriptions/#{URI.encode_www_form_component(subscription_id)}")
       nil
     end
   end

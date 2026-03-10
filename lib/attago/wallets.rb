@@ -8,7 +8,7 @@ module Attago
       @client = client
     end
 
-    # POST /wallets/register
+    # POST /payments/wallet
     def register(input)
       body = {
         "walletAddress" => input.wallet_address,
@@ -16,19 +16,19 @@ module Attago
         "signature" => input.signature,
         "timestamp" => input.timestamp
       }
-      data = @client.request("POST", "/wallets/register", body: body)
+      data = @client.request("POST", "/payments/wallet", body: body)
       Wallet.from_hash(data)
     end
 
-    # GET /wallets
+    # GET /payments/wallets
     def list
-      data = @client.request("GET", "/wallets")
+      data = @client.request("GET", "/payments/wallets")
       (data["wallets"] || []).map { |w| Wallet.from_hash(w) }
     end
 
-    # DELETE /wallets/{address}
+    # DELETE /payments/wallet/{address}
     def remove(address)
-      @client.request("DELETE", "/wallets/#{URI.encode_www_form_component(address)}")
+      @client.request("DELETE", "/payments/wallet/#{URI.encode_www_form_component(address)}")
       nil
     end
   end
