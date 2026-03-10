@@ -26,9 +26,4 @@ jobs:
         run: gem build attago.gemspec
 
       - name: Publish to RubyGems
-        run: |
-          mkdir -p ~/.gem
-          echo "---" > ~/.gem/credentials
-          echo ":rubygems_api_key: ${{ secrets.RUBYGEMS_API_KEY }}" >> ~/.gem/credentials
-          chmod 0600 ~/.gem/credentials
-          gem push attago-*.gem
+        uses: rubygems/release-gem@v1
