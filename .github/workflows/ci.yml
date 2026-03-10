@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -21,3 +21,28 @@ jobs:
           bundler-cache: true
       - name: Run tests
         run: bundle exec rake test
+
+  conformance:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Fetch attago-spec
+        uses: actions/checkout@v4
+        with:
+          repository: AttaGo/attago-spec
+          path: attago-spec
+
+      - name: Run conformance
+        env:
+          ATTAGO_BASE_URL: ${{ secrets.ATTAGO_DEV_BASE_URL }}
+          ATTAGO_API_KEY: ${{ secrets.ATTAGO_DEV_API_KEY }}
+          ATTAGO_SPEC_DIR: ./attago-spec
+        run: bundle exec ruby -Ilib -Itest test/conformance/test_conformance.rb
