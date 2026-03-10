@@ -1,13 +1,16 @@
 # attago
 
 [![CI](https://github.com/AttaGo/attago-rb-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/AttaGo/attago-rb-sdk/actions/workflows/ci.yml)
-[![Gem Version](https://badge.fury.io/rb/attago.svg)](https://badge.fury.io/rb/attago)
+[![Gem Version](https://badge.fury.io/rb/attago.svg)](https://rubygems.org/gems/attago)
 
 Ruby SDK for the [AttaGo](https://attago.bid) crypto trading dashboard API.
+Available on [RubyGems](https://rubygems.org/gems/attago).
 
 Go/No-Go crypto trading signals, alert subscriptions, x402 payments, webhook
-HMAC verification, and MCP JSON-RPC 2.0 -- **zero runtime dependencies**
-(stdlib only).
+HMAC verification, and MCP JSON-RPC 2.0.
+
+- [API Documentation](https://attago.bid/docs)
+- [Source Code](https://github.com/AttaGo/attago-rb-sdk)
 
 ## Install
 
@@ -250,3 +253,7 @@ bundle exec rake test
 # Run conformance tests (requires live API)
 ATTAGO_BASE_URL=https://api.attago.bid ATTAGO_API_KEY=ak_... bundle exec rake conformance
 ```
+
+## License
+
+All rights reserved. See [LICENSE](LICENSE) for details.
