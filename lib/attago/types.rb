@@ -567,6 +567,32 @@ module Attago
     end
   end
 
+  # ── Messaging types ─────────────────────────────────────────────────
+
+  MessagingLink = Struct.new(:platform, :username, :linked_at, keyword_init: true) do
+    def self.from_hash(data)
+      new(
+        platform: data["platform"],
+        username: data["username"],
+        linked_at: data["linkedAt"]
+      )
+    end
+  end
+
+  MessagingLinkResult = Struct.new(:linked, :username, keyword_init: true)
+
+  MessagingUnlinkResult = Struct.new(:unlinked, keyword_init: true)
+
+  MessagingTestResult = Struct.new(:success, :platforms, :errors, keyword_init: true) do
+    def self.from_hash(data)
+      new(
+        success: data["success"],
+        platforms: data["platforms"] || [],
+        errors: data["errors"] || []
+      )
+    end
+  end
+
   # ── Redeem types ────────────────────────────────────────────────────
 
   RedeemResponse = Struct.new(:tier, :expires_at, :message, keyword_init: true) do

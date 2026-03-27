@@ -12,7 +12,8 @@ module Attago
 
     attr_reader :base_url,
                 :agent, :data, :subscriptions, :payments, :wallets,
-                :webhooks, :mcp, :api_keys, :bundles, :push, :redeem
+                :webhooks, :mcp, :api_keys, :bundles, :push, :messaging,
+                :redeem
 
     def initialize(api_key: nil, signer: nil, email: nil, password: nil,
                    cognito_client_id: nil, cognito_region: DEFAULT_COGNITO_REGION,
@@ -55,6 +56,7 @@ module Attago
       @api_keys = ApiKeyService.new(self)
       @bundles = BundleService.new(self)
       @push = PushService.new(self)
+      @messaging = MessagingService.new(self)
       @redeem = RedeemService.new(self)
     end
 
