@@ -26,7 +26,12 @@ class TestConformance < Minitest::Test
         req = fixture["request"]
         expected = fixture["response"]
 
-        uri = URI.parse("#{BASE_URL}#{req['path']}")
+        # Substitute path parameters (e.g. {id}) before building the URI
+        resolved_path = req["path"]
+        (req["pathParameters"] || {}).each do |k, v|
+          resolved_path = resolved_path.gsub("{#{k}}", v)
+        end
+        uri = URI.parse("#{BASE_URL}#{resolved_path}")
         if req["query"]
           uri.query = URI.encode_www_form(req["query"])
         end
