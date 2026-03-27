@@ -17,6 +17,8 @@ class TestConformance < Minitest::Test
       next if headers.key?("Authorization")
       # Auto-skip unauthorized tests (dev API may not enforce auth)
       next if status == 401 && !headers.key?("X-API-Key")
+      # Auto-skip fixtures that need pre-existing data (e.g. registered webhook)
+      next if fixture_data["requiresSetup"]
 
       test_name = File.basename(path, ".json").tr("-", "_")
 
